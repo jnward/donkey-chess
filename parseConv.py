@@ -127,7 +127,7 @@ with open("data/KingBaseLite2019-pgn/KingBaseLite2019-A00-A39.pgn") as pgn:
       #print(event)
       board = game.board()
       #print(board)
-      for move in game.mainline_moves():
+      for movenum, move in enumerate(game.mainline_moves()):
   
         #board.push(move)
         #print("Result:", result)
@@ -164,14 +164,28 @@ with open("data/KingBaseLite2019-pgn/KingBaseLite2019-A00-A39.pgn") as pgn:
             out_result = -2*int(result[0])+1
 
 
-        out_batch.append(np.concatenate([input_vec,[out_move,out_result]]))
+        #out_batch.append(np.concatenate([input_vec,[out_move,out_result]]))
+
+        
+        out_array = np.concatenate([[out_result], input_vec])
+
+        fileName = str(game_num*1000+movenum)
+
+        np.save('data/npfiles/%s'%(fileName),out_array)
 
         board.push(move)
 
       input_vec = generate_input_vec()
 
-      out_batch.append(np.concatenate([input_vec,["0000", out_result]]))
-      writer.writerows(out_batch)
+      #out_batch.append(np.concatenate([input_vec,["0000", out_result]]))
+
+      out_array = np.concatenate([[out_result], input_vec])
+
+      fileName = str(game_num*1000+999)
+
+      np.save('data/npfiles/%s'%(fileName),out_array)
+
+      #writer.writerows(out_batch)
       if(game_num % 10 == 0):  
         print(game_num)
         #print(input_vec)

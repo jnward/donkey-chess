@@ -44,6 +44,11 @@ with open("data/KingBaseLite2019-pgn/KingBaseLite2019-A00-A39.pgn") as pgn:
       print(len(board.pieces(chess.QUEEN, chess.BLACK)))
       print(len(board.pieces(chess.KING, chess.BLACK)))
 
+      #piece lists
+      
+
+
+
       
 
     print("\n")

@@ -3,11 +3,12 @@ import numpy as np
 import csv
 
 from keras.models import Sequential
-import DataGenerator
+from keras.layers import *
+from DataGenerator import DataGenerator
 
 def main():
 	params = {'dim' : (8,8),
-			  'batch_size' : 128,
+			  'batch_size' : 256,
 			  'n_classes' : 3,
 			  'n_channels' : 7,
 			  'shuffle' : True}
@@ -19,9 +20,32 @@ def main():
 	partitions = {'train' : IDs[:pivot],
 				  'validation' : IDs[pivot:]}
 
-	print(num_IDs)
-	print(partitions.get('train'), partitions['validation'])
-	print(partitions['train'][-2:], partitions['validation'][0:2])
+	train_generator = DataGenerator(partitions['train'], **params)
+	validation_generator = DataGenerator(partitions['validation'], **params)
+
+	#X, y = train_generator._DataGenerator__data_generation(partitions['train'][0:params['batch_size']])
+
+	#print(X[0])
+
+
+	model = Sequential()
+	model.add(Conv2D(32,kernel_size=(4,4),data_format='channels_first',batch_size=params['batch_size'], batch_input_shape=(params['batch_size'],7,8,8)))
+	model.add(Activation('relu'))
+	model.add(Flatten())
+	model.add(Dense(3))	
+	model.add(Activation('softmax'))
+	model.compile(optimizer='adam',
+				  loss='categorical_crossentropy',
+				  metrics=['accuracy'])
+
+	print(model.summary())
+
+	model.fit_generator(generator=train_generator,
+						validation_data=validation_generator,
+						use_multiprocessing=True,
+						workers=16,
+						epochs=10,
+						verbose=1)
 
 
 def setIDs(filename):

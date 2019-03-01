@@ -3,7 +3,7 @@ import keras
 
 class DataGenerator(keras.utils.Sequence):
 
-	def __init__(self, list_IDs, labels, batch_size=128, dim=(8,8), n_channels = 7, n_classes=3, shuffle=True):
+	def __init__(self, list_IDs, batch_size=128, dim=(8,8), n_channels = 7, n_classes=3, shuffle=True):
 		self.dim = dim
 		self.batch_size = batch_size
 		#self.labels = labels
@@ -27,19 +27,22 @@ class DataGenerator(keras.utils.Sequence):
 		return X, y
 
 	def on_epoch_end(self):
-		self.indexes = np.arrange(len(self.list_IDs))
+		self.indexes = np.arange(len(self.list_IDs))
 		if self.shuffle:
 			np.random.shuffle(self.indexes)
 
 	def __data_generation(self, list_IDs_temp):
 
-		X = np.empty((self.batch_size, *self.dim, self.n_channels))
+		X = np.empty((self.batch_size, self.n_channels, *self.dim), dtype=int)
 		y = np.empty((self.batch_size), dtype=int)
 
 		for i, ID in enumerate(list_IDs_temp):
 
 			datum = np.load('data/npfiles/%s.npy'%(str(ID)))
-			X[i,] = datum[1:]
-			y[i] = datum[0]
+			#X[i,] = datum[1:]
+			X[i,] = np.reshape(datum[1:], (self.n_channels, self.dim[0], self.dim[1]))
+			y[i] = int(datum[0])+1
 
-		return X, keras.utils.to_categorical(y+1, num_classes=self.n_classes)
+
+		#return X, y
+		return X, keras.utils.to_categorical(y, num_classes=self.n_classes)

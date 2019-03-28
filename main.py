@@ -31,8 +31,9 @@ def main():
 	model = Sequential()
 	model.add(Conv2D(32,kernel_size=(4,4),data_format='channels_first',batch_size=params['batch_size'], batch_input_shape=(params['batch_size'],7,8,8)))
 	model.add(Activation('relu'))
+	model.add(Conv2D(64,kernel_size=(2,2), data_format='channels_first'))
 	model.add(Flatten())
-	model.add(Dense(3))	
+	model.add(Dense(3))
 	model.add(Activation('softmax'))
 	model.compile(optimizer='adam',
 				  loss='categorical_crossentropy',
@@ -45,7 +46,12 @@ def main():
 						use_multiprocessing=True,
 						workers=16,
 						epochs=10,
-						verbose=1)
+						verbose=1,
+						callbacks=[checkpoint])
+
+	filepath = "/data/models"
+	checkpoint = ModelCheckpoint(filepath, monitor='val_acc', verbose=1, mode='max')
+
 
 
 def setIDs(filename):

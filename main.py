@@ -41,6 +41,9 @@ def main():
 
 	print(model.summary())
 
+	filepath = "/data/models"
+	checkpoint = ModelCheckpoint(filepath, monitor='val_acc', verbose=1, mode='max')
+
 	model.fit_generator(generator=train_generator,
 						validation_data=validation_generator,
 						use_multiprocessing=True,
@@ -49,8 +52,6 @@ def main():
 						verbose=1,
 						callbacks=[checkpoint])
 
-	filepath = "/data/models"
-	checkpoint = ModelCheckpoint(filepath, monitor='val_acc', verbose=1, mode='max')
 
 
 

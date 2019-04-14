@@ -169,9 +169,11 @@ with open("data/KingBaseLite2019-pgn/KingBaseLite2019-A00-A39.pgn") as pgn:
         
         out_array = np.concatenate([[out_result], input_vec])
 
-        fileName = str(game_num*1000+movenum)
+        writer.writerow(out_array)
 
-        np.save('data/npfiles/%s'%(fileName),out_array)
+        #fileName = str(game_num*1000+movenum)
+
+        #np.save('data/npfiles/%s'%(fileName),out_array)
 
         board.push(move)
 
@@ -181,9 +183,13 @@ with open("data/KingBaseLite2019-pgn/KingBaseLite2019-A00-A39.pgn") as pgn:
 
       out_array = np.concatenate([[out_result], input_vec])
 
-      fileName = str(game_num*1000+999)
+      writer.writerow(out_array)
 
-      np.save('data/npfiles/%s'%(fileName),out_array)
+      #fileName = str(game_num*1000+999)
+
+      #np.save('data/npfiles/%s'%(fileName),out_array)
+
+
 
       #writer.writerows(out_batch)
       if(game_num % 10 == 0):  

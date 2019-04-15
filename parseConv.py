@@ -2,6 +2,7 @@ import chess
 import chess.pgn
 import numpy as np
 import csv
+from os import walk
 
 #state := board, next move, final result
 
@@ -108,93 +109,102 @@ def generate_input_vec():
 
   return input_vec
 
-with open("data/KingBaseLite2019-pgn/KingBaseLite2019-A00-A39.pgn") as pgn:
-  game_num = 0
-  with open('parsedGames.csv', 'w') as out:
-    writer = csv.writer(out, delimiter=',')
-    while(True):
-      game_num += 1
-      #print(game_num)
-      game = chess.pgn.read_game(pgn)
-      result = game.headers.get("Result")
-      event = game.headers.get("Event")
-      out_batch = []
-      if "blitz" in event.lower():
-        continue
-      elif "rapid" in event.lower():
-        continue
-  
-      #print(event)
-      board = game.board()
-      #print(board)
-      for movenum, move in enumerate(game.mainline_moves()):
-  
-        #board.push(move)
-        #print("Result:", result)
-        #print(move)
-        #print(board.turn)
+in_files = []
+for path, dirs, files in walk("data/KingBaseLite2019-pgn"):
+  in_files = files
+  break
+
+for file in in_files:
+  print(file)
+
+for i, file in enumerate(in_files):
+  with open("data/KingBaseLite2019-pgn/" + file) as pgn:
+    game_num = 0
+    with open('data/parsed_games/parsed_' + str(i), 'w') as out:
+      writer = csv.writer(out, delimiter=',')
+      while(True):
+        game_num += 1
+        #print(game_num)
+        game = chess.pgn.read_game(pgn)
+        result = game.headers.get("Result")
+        event = game.headers.get("Event")
+        out_batch = []
+        if "blitz" in event.lower():
+          continue
+        elif "rapid" in event.lower():
+          continue
+    
+        #print(event)
+        board = game.board()
         #print(board)
-  
-      
-
-        input_vec = generate_input_vec()
-
-
-        #flip move
-        if not board.turn:
-          flip_move = []
-          for i,c in enumerate(move.uci()):
-            if(i%2):
-              char = str(9-int(c))
-            else:
-              char = c
-            flip_move += [char]
-          out_move = ''.join(flip_move)
-        else:
-          out_move = move.uci()
-
-              
-        if len(result) == 7:
-          out_result = 0
-        else:
-          if board.turn:
-            #white to move
-            out_result = 2*int(result[0])-1
-          else:
-            out_result = -2*int(result[0])+1
-
-
-        #out_batch.append(np.concatenate([input_vec,[out_move,out_result]]))
-
+        for movenum, move in enumerate(game.mainline_moves()):
+    
+          #board.push(move)
+          #print("Result:", result)
+          #print(move)
+          #print(board.turn)
+          #print(board)
+    
         
+  
+          input_vec = generate_input_vec()
+  
+  
+          #flip move
+          if not board.turn:
+            flip_move = []
+            for i,c in enumerate(move.uci()):
+              if(i%2):
+                char = str(9-int(c))
+              else:
+                char = c
+              flip_move += [char]
+            out_move = ''.join(flip_move)
+          else:
+            out_move = move.uci()
+  
+                
+          if len(result) == 7:
+            out_result = 0
+          else:
+            if board.turn:
+              #white to move
+              out_result = 2*int(result[0])-1
+            else:
+              out_result = -2*int(result[0])+1
+  
+  
+          #out_batch.append(np.concatenate([input_vec,[out_move,out_result]]))
+  
+          
+          out_array = np.concatenate([[out_result], input_vec])
+  
+          writer.writerow(out_array)
+  
+          #fileName = str(game_num*1000+movenum)
+  
+            #np.save('data/npfiles/%s'%(fileName),out_array)
+  
+          board.push(move)
+  
+        input_vec = generate_input_vec()
+  
+        #out_batch.append(np.concatenate([input_vec,["0000", out_result]]))
+  
         out_array = np.concatenate([[out_result], input_vec])
-
-        writer.writerow(out_array)
-
-        #fileName = str(game_num*1000+movenum)
-
+  
+        writer.writerow(out_array) 
+  
+        #fileName = str(game_num*1000+999)
+  
         #np.save('data/npfiles/%s'%(fileName),out_array)
 
-        board.push(move)
-
-      input_vec = generate_input_vec()
-
-      #out_batch.append(np.concatenate([input_vec,["0000", out_result]]))
-
-      out_array = np.concatenate([[out_result], input_vec])
-
-      writer.writerow(out_array)
-
-      #fileName = str(game_num*1000+999)
-
-      #np.save('data/npfiles/%s'%(fileName),out_array)
 
 
-
-      #writer.writerows(out_batch)
-      if(game_num % 10 == 0):  
-        print(game_num)
-        #print(input_vec)
+        #writer.writerows(out_batch)
+        if(game_num % 10 == 0):  
+          print(game_num)
+          #print(input_vec)
         
 
       

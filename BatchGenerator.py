@@ -21,9 +21,9 @@ class BatchGenerator():
 			break
 		print(files)
 		#with open('parsedGames_shuf.csv', 'r') as file:
-		file = open('parsedGames_small.csv', 'r')
+		#file = open('parsedGames_small.csv', 'r')
 		
-		if True:
+		while True:
 			#reader = csv.reader(file, delimiter=',')
 
 			count = 0
@@ -40,7 +40,9 @@ class BatchGenerator():
 					boards = []
 					count = 0
 			'''
-			while(True):
+			for file_name in files:
+				file = open('data/parsed_games/'+file_name)
+				print("Reading from file: " + file_name)
 				reader = csv.reader(file, delimiter=',')
 				X = np.empty((self.batch_size, self.n_channels, *self.dim), dtype=int)
 				y = np.empty((self.batch_size), dtype=int)
@@ -55,9 +57,10 @@ class BatchGenerator():
 					if steps >= 15:
 						print("Break")
 						file.close()
-						file = open('data/parsed_games/'+files[0])
+						break
+						#file = open('data/parsed_games/'+files[0])
 						#file.seek(0)
-						steps = 0
+						#steps = 0
 
 					if count >= self.batch_size:
 						yield X, keras.utils.to_categorical(y, num_classes=self.n_classes)

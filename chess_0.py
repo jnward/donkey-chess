@@ -25,7 +25,7 @@ app.run()
 
 #board_0.push(list(board_0.legal_moves)[0])
 
-MAX_DEPTH = 3
+MAX_DEPTH = 1
 
 piece_dict = { "P" : 10,
                "p" : -10,
@@ -44,13 +44,15 @@ piece_dict = { "P" : 10,
 def play():
   print(board_0.unicode())
   while(True):
-    #parse_user_move(board_0)
-    make_computer_move_white(board_0)
+    parse_user_move(board_0)
+    #make_computer_move_white(board_0)
     print(board_0.unicode())
+    input()
     make_computer_move(board_0)
     #make_keras_move(board_0)
     print(board_0.unicode())
-  
+    input()
+
 def parse_user_move(board):
   while(True):
     try:
@@ -65,6 +67,7 @@ def parse_user_move(board):
 def make_computer_move(board):
   move_list = list(board.legal_moves)
   num_moves = len(move_list)
+  print(move_list)
   if num_moves == 0:
     print("Game over.")
   else:
@@ -163,8 +166,9 @@ def _evaluate(board):
 
 def evaluate(board):
   logits = infer_from_board(board)[0]
-  if not board.turn:
-    logits = logits[::-1]
+  #print(logits)
+  #if not board.turn:
+  #  logits = logits[::-1]
   return logits[2]
   
 

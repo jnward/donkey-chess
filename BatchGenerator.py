@@ -6,8 +6,9 @@ from os import walk
 
 class BatchGenerator():
 
-	def __init__(self, list_IDs=None, batch_size=128, dim=(8,8), n_channels = 7, n_classes=3, shuffle=True):
+	def __init__(self, data_path, list_IDs=None, batch_size=128, dim=(8,8), n_channels = 7, n_classes=3, shuffle=True):
 		self.dim = dim
+		self.data_path = data_path
 		self.batch_size = batch_size
 		#self.labels = labels
 		self.list_IDs = list_IDs
@@ -16,7 +17,7 @@ class BatchGenerator():
 		self.shuffle = shuffle
 
 	def gen_boards(self):
-		for _, _, file in walk('data/parsed_games'):
+		for _, _, file in walk(self.data_path):
 			files = file
 			break
 		print(files)
@@ -41,7 +42,7 @@ class BatchGenerator():
 					count = 0
 			'''
 			for file_name in files:
-				file = open('data/parsed_games/'+file_name)
+				file = open(self.data_path + "/" + file_name)
 				print("Reading from file: " + file_name)
 				reader = csv.reader(file, delimiter=',')
 				X = np.empty((self.batch_size, self.n_channels, *self.dim), dtype=int)
@@ -54,7 +55,7 @@ class BatchGenerator():
 					#X[i,] = datum[1:]
 					X[count-1,] = np.reshape(datum, (self.n_channels, self.dim[0], self.dim[1]))
 					y[count-1] = int(board[0])+1
-					if steps >= 15:
+					if steps >= 10000:
 						print("Break")
 						file.close()
 						break
@@ -68,8 +69,8 @@ class BatchGenerator():
 						count = 0
 						X = np.empty((self.batch_size, self.n_channels, *self.dim), dtype=int)
 						y = np.empty((self.batch_size), dtype=int)
-
-
+				print("EOF")
+				file.close()
 
 		#return X, y
 		#return X, keras.utils.to_categorical(y, num_classes=self.n_classes)

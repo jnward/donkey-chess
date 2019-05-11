@@ -4,6 +4,7 @@ import numpy as np
 import csv
 from os import walk
 
+import random
 #state := board, next move, final result
 
 #for game in file:
@@ -109,23 +110,28 @@ def generate_input_vec():
 
   return input_vec
 
+data_path = "data/kingbase-lite-2019"
 in_files = []
-for path, dirs, files in walk("data/KingBaseLite2019-pgn"):
+for path, dirs, files in walk(data_path):
   in_files = files
   break
-
+print(in_files)
+print("files^^^")
 for file in in_files:
   print(file)
 
 for i, file in enumerate(in_files):
-  with open("data/KingBaseLite2019-pgn/" + file) as pgn:
+  with open(data_path + "/" + file) as pgn:
     game_num = 0
-    with open('data/parsed_games/parsed_' + str(i), 'w') as out:
+    with open('data/parsed_games_aug2/parsed_' + str(i), 'w') as out:
       writer = csv.writer(out, delimiter=',')
       while(True):
         game_num += 1
         #print(game_num)
-        game = chess.pgn.read_game(pgn)
+        try:
+            game = chess.pgn.read_game(pgn)
+        except:
+            break
         result = game.headers.get("Result")
         event = game.headers.get("Event")
         out_batch = []
@@ -144,11 +150,17 @@ for i, file in enumerate(in_files):
           #print(move)
           #print(board.turn)
           #print(board)
-    
-        
-  
+          flip = False
+          if random.random() > 0.8 and result == '1-0':
+            flip = True
+
+
+          if flip:
+            board.turn = not board.turn
+
           input_vec = generate_input_vec()
-  
+          if flip:
+            board.turn = not board.turn 
   
           #flip move
           if not board.turn:
@@ -163,17 +175,21 @@ for i, file in enumerate(in_files):
           else:
             out_move = move.uci()
   
-                
-          if len(result) == 7:
-            out_result = 0
-          else:
-            if board.turn:
-              #white to move
-              out_result = 2*int(result[0])-1
+          try:      
+            if len(result) == 7:
+              out_result = 0
             else:
-              out_result = -2*int(result[0])+1
-  
-  
+              if board.turn:
+                #white to move
+                out_result = 2*int(result[0])-1
+              else:
+                out_result = -2*int(result[0])+1
+          except:
+              break
+
+          if flip:
+            out_result = 1
+
           #out_batch.append(np.concatenate([input_vec,[out_move,out_result]]))
   
           

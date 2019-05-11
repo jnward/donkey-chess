@@ -10,7 +10,7 @@ from keras.callbacks import ModelCheckpoint
 
 import numpy as np
 
-model = load_model('models/model-07-0.480.hdf5')
+model = load_model('models/mod6/model-08-0.495.hdf5')
 
 def generate_input_vec(board):
   white_pawns = board.pieces(chess.PAWN, chess.WHITE)
@@ -103,7 +103,7 @@ def generate_input_vec(board):
                              queens_array,
                              kings_array,
                              empty_squares])
-  #print(np.reshape(input_vec, (7,8,8)))
+  print(np.reshape(input_vec, (7,8,8)))
   input_vec = input_vec.astype(int)
 
   return input_vec
@@ -180,7 +180,7 @@ def infer_from_board(board):
   in_vec = np.reshape(in_vec, (1,7,8,8))
 
   logits = model.predict(in_vec, verbose=0)
-
+  #print(logits)
   return logits
 
 if __name__ == "__main__":
